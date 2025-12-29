@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday My Love</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Mali', cursive;
+            background-color: #ffe4e6;
+            overflow-x: hidden;
+            cursor: pointer;
+        }
+
+        /* --- Animations --- */
+        .float-up { animation: floatUp 4s ease-in-out infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .pulse-heart { animation: pulse 1.5s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- Elements --- */
+        #confetti-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 50;
+        }
+
+        /* Click Particles */
+        .click-particle {
+            position: fixed; width: 10px; height: 10px; border-radius: 50%;
+            pointer-events: none; z-index: 9999; animation: particleFade 0.8s forwards;
+        }
+        @keyframes particleFade {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Cursor Trail */
+        .cursor-trail {
+            position: fixed; border-radius: 50%; pointer-events: none;
+            z-index: 9998; transition: transform 0.5s, opacity 0.5s;
+        }
+
+        .gift-box { transition: all 0.5s ease; cursor: pointer; }
+        .gift-box:hover { transform: scale(1.05) rotate(3deg); }
+        .gift-open { animation: openGift 0.8s forwards; }
+        @keyframes openGift {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2) rotate(-5deg); opacity: 1; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .flame {
+            width: 15px; height: 25px; background: orange;
+            border-radius: 50% 50% 20% 20%; position: absolute;
+            top: -25px; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 0 10px orange, 0 0 20px yellow;
+            animation: flicker 0.5s infinite alternate; cursor: pointer;
+        }
+        .flame.out { display: none; }
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            100% { transform: translateX(-50%) scale(0.9); opacity: 0.8; }
+        }
+
+        /* --- Smoke Effect (Adjusted Timing) --- */
+        .smoke-puff {
+            position: absolute;
+            top: -5px; /* Moved closer to wick */
+            left: 50%;
+            width: 8px; height: 8px;
+            background: rgba(200, 200, 200, 0.6);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            /* Adjusted duration to 2.5s for clearer sequence */
+            animation: smokeRise 2.5s forwards;
+            z-index: 40;
+            pointer-events: none;
+        }
+        @keyframes smokeRise {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+            100% { transform: translateX(-50%) translateY(-100px) scale(5); opacity: 0; }
+        }
+
+        /* --- Fountain Sparkler Effect --- */
+        .sparkle-fountain {
+            position: absolute;
+            width: 4px; height: 4px; /* Slightly bigger */
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 45;
+            box-shadow: 0 0 6px #ffd700, 0 0 12px #ffeb3b; /* Brighter glow */
+            animation: fountainAnim 0.8s ease-out forwards;
+        }
+        @keyframes fountainAnim {
+            0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx)), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        .photo-frame {
+            border: 8px solid white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transform: rotate(-3deg); transition: transform 0.3s;
+            /* Added overflow hidden for captions */
+            overflow: hidden; 
+        }
+        .photo-frame:nth-child(even) { transform: rotate(3deg); }
+        .photo-frame:hover { transform: rotate(0deg) scale(1.05); z-index: 10; }
+
+        .music-btn {
+            position: fixed; bottom: 20px; right: 20px; z-index: 100;
+            background: white; border-radius: 50%; width: 50px; height: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.3s;
+        }
+        .music-btn:hover { transform: scale(1.1); }
+        .music-playing { animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0;
+            overflow: hidden; border-radius: 10px; background-color: #000;
+        }
+        .video-container iframe, .video-container video {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: contain;
+        }
+
+        .hidden-yt {
+            position: absolute; width: 1px; height: 1px;
+            opacity: 0.01; pointer-events: none; z-index: -1; bottom: 0; right: 0;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake { animation: shake 0.3s ease-in-out; }
+
+        /* --- 3D Cube Styles --- */
+        .scene { width: 120px; height: 120px; perspective: 600px; margin: 20px auto; }
+        .cube {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transform: translateZ(-60px);
+            animation: spinCube 8s infinite linear;
+        }
+        .cube__face {
+            position: absolute; width: 120px; height: 120px;
+            border: 2px solid #db2777; background: #fbcfe8;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0.95; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+        .cube__face::before { content: ''; position: absolute; width: 25px; height: 100%; background: #ec4899; }
+        .cube__face::after { content: ''; position: absolute; width: 100%; height: 25px; background: #ec4899; }
+        .cube__face--front  { transform: rotateY(  0deg) translateZ(60px); }
+        .cube__face--right  { transform: rotateY( 90deg) translateZ(60px); }
+        .cube__face--back   { transform: rotateY(180deg) translateZ(60px); }
+        .cube__face--left   { transform: rotateY(-90deg) translateZ(60px); }
+        .cube__face--top    { transform: rotateX( 90deg) translateZ(60px); }
+        .cube__face--bottom { transform: rotateX(-90deg) translateZ(60px); }
+        @keyframes spinCube {
+            0% { transform: translateZ(-60px) rotateX(-20deg) rotateY(0deg); }
+            100% { transform: translateZ(-60px) rotateX(-20deg) rotateY(360deg); }
+        }
+
+        .ribbon-bow { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; z-index: 10; }
+        .ribbon-loop { position: absolute; width: 40px; height: 40px; background: #be185d; border: 2px solid #9d174d; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .ribbon-loop.left { transform: translateZ(5px) rotate(-45deg) translateX(8px); border-radius: 50% 50% 0 50%; background: radial-gradient(circle at 30% 30%, #fbcfe8 10%, #ec4899 60%); }
+        .ribbon-loop.right { transform: translateZ(5px) rotate(45deg) translateX(-8px); border-radius: 50% 50% 50% 0; background: radial-gradient(circle at 70% 30%, #fbcfe8 10%, #ec4899 60%); }
+        .ribbon-knot { position: absolute; width: 14px; height: 14px; background: #9d174d; transform: translateZ(8px); border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); z-index: 20; }
+
+        /* --- Envelope Styles (Sandwich Method) --- */
+        .envelope-container { display: flex; justify-content: center; align-items: center; perspective: 1000px; margin-top: 40px; }
+        .envelope { position: relative; width: 300px; height: 200px; background-color: #fbcfe8; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .letter {
+            position: absolute; bottom: 0; left: 50%; width: 90%; height: 90%; background: white;
+            transform: translateX(-50%); transition: transform 0.6s ease-out 0.6s; z-index: 2;
+            padding: 20px; text-align: center; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        }
+        .envelope::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 0;
+            border-left: 150px solid transparent; border-right: 150px solid transparent;
+            border-bottom: 120px solid #ed64a6; z-index: 3; pointer-events: none;
+        }
+        .envelope::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0;
+            border-top: 100px solid transparent; border-bottom: 100px solid transparent;
+            border-left: 150px solid #f687b3; border-right: 150px solid #f687b3;
+            z-index: 3; pointer-events: none;
+        }
+        .flap {
+            position: absolute; top: 0; left: 0; width: 0; height: 0;
+            border-left: 150px solid transparent; border-right: 150px solid transparent;
+            border-top: 120px solid #db2777; transform-origin: top;
+            transition: transform 0.6s ease-in-out; z-index: 4;
+        }
+        .envelope.open .flap { transform: rotateX(180deg); z-index: 1; }
+        .envelope.open .letter { transform: translateX(-50%) translateY(-150px); }
+
+        /* --- Review Modal Styles --- */
+        .review-modal-content { background: white; padding: 20px; border-radius: 20px; max-width: 320px; width: 100%; text-align: center; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .char-img-container { width: 150px; height: 150px; margin: -60px auto 20px; border-radius: 50%; overflow: hidden; border: 5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); background: #ffe4e6; }
+        .char-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .star-rating { display: flex; justify-content: center; gap: 10px; margin: 15px 0; }
+        .star { font-size: 30px; color: #ddd; cursor: pointer; transition: color 0.2s, transform 0.2s; }
+        .star:hover, .star.active { color: #fbbf24; transform: scale(1.2); }
+        .chat-bubble { background: #fdf2f8; padding: 15px; border-radius: 15px; position: relative; margin-bottom: 20px; border: 2px solid #fbcfe8; }
+        .chat-bubble::after { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); border-width: 0 10px 10px; border-style: solid; border-color: #fbcfe8 transparent; display: block; width: 0; }
+
+        /* --- Finale & Curtain Styles --- */
+        #finale-screen {
+            position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 140;
+            background-color: #fbcfe8; opacity: 0; transition: opacity 0.5s; pointer-events: none;
+        }
+        #finale-screen.active { pointer-events: auto; opacity: 1; }
+        #finale-char { opacity: 0; transform: scale(0.5); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #finale-char.show { opacity: 1; transform: scale(1); }
+        #finale-msg { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+        #finale-msg.show { opacity: 1; transform: translateY(0); }
+        #curtain {
+            position: fixed; top: -100%; left: 0; width: 100%; height: 100%;
+            background-color: #be185d; z-index: 150; transition: top 1.5s ease-in-out;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+        }
+        #curtain::after { content: "See you ❤️"; color: white; font-size: 3rem; font-weight: bold; opacity: 0; transition: opacity 1s 1.5s; }
+        #curtain.dropped { top: 0; }
+        #curtain.dropped::after { opacity: 1; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- 1. Audio Elements (Local File: HBDsong.mp3) -->
+    <audio id="bg-music" loop>
+        <source src="HBDsong.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Canvas for Confetti -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Curtain (Hidden Initially) -->
+    <div id="curtain"></div>
+
+    <!-- Finale Screen -->
+    <div id="finale-screen">
+        <div id="finale-char" class="char-img-container transform scale-125 mb-6">
+            <img src="pic1.png" alt="Bye Bye" onerror="this.src='https://via.placeholder.com/150/fbcfe8/be185d?text=Pic1'">
+        </div>
+        <div id="finale-msg" class="bg-white px-8 py-4 rounded-3xl shadow-xl border-2 border-pink-400 relative">
+            <h2 class="text-2xl font-bold text-pink-600">แล้วเจอกันใหม่นะคนเก่ง 👋</h2>
+            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[12px] border-b-white"></div>
+        </div>
+    </div>
+
+    <!-- Screen 1: Welcome -->
+    <div id="welcome-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-pink-50 z-40 transition-opacity duration-1000">
+        <h1 class="text-3xl md:text-5xl font-bold text-pink-500 mb-8 text-center px-4">มีอะไรจะบอก... <br>ลองเปิดกล่องดูสิ!</h1>
+        <div id="gift-trigger" class="gift-box relative group">
+            <div class="text-9xl text-red-500 drop-shadow-xl">🎁</div>
+            <div class="absolute -top-4 -right-4 bg-white px-3 py-1 rounded-full text-pink-500 text-sm font-bold shadow-md animate-bounce">Click Me!</div>
+        </div>
+        <p class="text-pink-300 text-sm mt-8 animate-pulse">(เปิดเสียงด้วยนะครับ 🔊)</p>
+    </div>
+
+    <!-- Screen 2: Main Content -->
+    <div id="main-content" class="hidden opacity-0 transition-opacity duration-1000 min-h-screen pb-20">
+        <header class="pt-10 pb-6 text-center px-4">
+            <h1 class="text-4xl md:text-6xl font-bold text-pink-600 mb-2 float-up">Happy Birthday! 🎉</h1>
+            <p class="text-xl md:text-2xl text-pink-400 mt-2 font-medium">สุขสันต์วันเกิดนะคนเก่ง ❤️</p>
+        </header>
+        <section class="container mx-auto px-4 mb-10 text-center">
+            <div class="relative w-64 h-64 mx-auto mb-6 rounded-full border-4 border-pink-300 overflow-hidden shadow-xl pulse-heart">
+                <img src="https://img5.pic.in.th/file/secure-sv1/server70d552094a741881.jpg" alt="My Love" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/500x500?text=My+Love'">
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 max-w-lg mx-auto transform hover:scale-105 transition-transform duration-300">
+                <h3 class="text-xl text-pink-500 font-bold mb-2">เรารู้จักกันมา</h3>
+                <div id="counter" class="text-3xl font-bold text-gray-700">กำลังคำนวณ...</div>
+                <p class="text-gray-400 text-sm mt-2">และจะรักกันไปอีกนานๆ เลย</p>
+            </div>
+        </section>
+        <section class="container mx-auto px-4 mb-12">
+            <div class="bg-pink-100 rounded-3xl p-8 max-w-2xl mx-auto shadow-inner relative">
+                <i class="fas fa-quote-left text-4xl text-pink-300 absolute top-4 left-4"></i>
+                <div id="typewriter-text" class="text-lg md:text-xl text-gray-700 leading-relaxed text-center mt-6"></div>
+                <i class="fas fa-quote-right text-4xl text-pink-300 absolute bottom-4 right-4"></i>
+            </div>
+        </section>
+        <section class="container mx-auto px-4 mb-16">
+            <h2 class="text-3xl text-center text-pink-500 font-bold mb-8">ความทรงจำของเรา 📸</h2>
+            <div class="flex flex-wrap justify-center gap-6">
+                <!-- Frame 1 -->
+                <div class="photo-frame bg-white p-2 w-40 h-48 md:w-56 md:h-64 shadow-lg group relative">
+                    <img src="Frame1.png" alt="Memory 1" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/500x500?text=Frame1'">
+                    <div class="absolute inset-2 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p class="text-white font-bold text-lg text-center p-2">เหนื่อยมาก 😫</p>
+                    </div>
+                </div>
+                <!-- Frame 2 -->
+                <div class="photo-frame bg-white p-2 w-40 h-48 md:w-56 md:h-64 shadow-lg group relative">
+                    <img src="Frame2.jpg" alt="Memory 2" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/500x500?text=Frame2'">
+                    <div class="absolute inset-2 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p class="text-white font-bold text-lg text-center p-2">แอบถ่ายอยู่นะรู้ป่าวว</p>
+                    </div>
+                </div>
+                <!-- Frame 3 -->
+                <div class="photo-frame bg-white p-2 w-40 h-48 md:w-56 md:h-64 shadow-lg group relative">
+                    <img src="Frame3.png" alt="Memory 3" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/500x500?text=Frame3'">
+                    <div class="absolute inset-2 bg-black bg-opacity-60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p class="text-white font-bold text-lg text-center p-2">แก็งปากเบี้ยว<br>เปรี้ยวตีน</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="container mx-auto px-4 mb-20 text-center">
+            <h2 class="text-2xl text-pink-500 font-bold mb-10">อธิษฐานแล้วเป่าเทียนนะ 🎂</h2>
+            <div class="relative inline-block mt-10">
+                <div class="w-48 h-32 bg-pink-300 rounded-t-full relative mx-auto z-10 top-8"></div>
+                <div class="w-48 h-24 bg-pink-400 rounded-b-lg relative mx-auto z-10 shadow-lg flex items-center justify-center"><span class="text-white font-bold text-xl">HBD</span></div>
+                <div class="w-64 h-10 bg-gray-200 rounded-full absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-0"></div>
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 z-20">
+                    <div class="w-4 h-16 bg-red-400 mx-auto relative">
+                        <div class="w-full h-2 bg-yellow-200 absolute top-2"></div>
+                        <div class="w-full h-2 bg-yellow-200 absolute top-6"></div>
+                    </div>
+                    <div id="candle-flame" class="flame" onclick="blowCandle()"></div>
+                </div>
+            </div>
+            <p id="wish-text" class="mt-8 text-gray-500 text-sm">(แตะที่ไฟเพื่อเป่าเทียน)</p>
+        </section>
+        <footer class="text-center text-pink-300 pb-8 text-sm">Made with Love for You ❤️ <br><span id="current-year"></span></footer>
+    </div>
+
+    <div id="music-control" class="music-btn hidden" onclick="toggleMusic()"><i class="fas fa-music text-pink-500 text-xl"></i></div>
+
+    <!-- Full Screen Video Modal -->
+    <div id="video-modal" class="fixed inset-0 bg-black z-[100] hidden opacity-0 transition-opacity duration-300">
+        <!-- Close Button Top Right -->
+        <button onclick="closeVideo()" class="absolute top-6 right-6 text-white text-4xl hover:text-pink-500 transition-colors z-[110] drop-shadow-lg">
+            <i class="fas fa-times-circle"></i>
+        </button>
+
+        <!-- Full Screen Video Container -->
+        <div class="w-full h-full flex items-center justify-center">
+            <!-- 
+                 👇 วิดีโอไฟล์ hbd.mp4
+                 เอา muted ออกแล้ว เพื่อให้เล่นพร้อมเสียง
+            -->
+            <video id="hbd-video" class="w-full h-full object-contain" controls playsinline autoplay preload="auto">
+                <source src="hbd.mp4" type="video/mp4" onerror="alert('ไม่พบไฟล์วิดีโอ hbd.mp4 กรุณาตรวจสอบว่าไฟล์อยู่ในโฟลเดอร์เดียวกับ San.html หรือไม่')">
+                <p class="text-white">Your browser does not support the video tag. Or file not found.</p>
+            </video>
+        </div>
+
+        <!-- Text Overlay at Bottom -->
+        <div class="absolute bottom-12 w-full text-center pointer-events-none z-[105]">
+            <p class="text-white text-2xl font-bold animate-bounce drop-shadow-md">Surprise! 🎉</p>
+            <!-- Error Message Container (Hidden by default) -->
+            <p id="video-error-msg" class="text-red-500 bg-white p-2 rounded mt-2 hidden inline-block pointer-events-auto shadow-lg"></p>
+            <!-- Play Button Manual Fallback -->
+            <button id="manual-play-btn" onclick="manualPlayVideo()" class="hidden mt-4 bg-white text-pink-600 px-6 py-2 rounded-full font-bold shadow-lg pointer-events-auto animate-pulse">
+                <i class="fas fa-play mr-2"></i> กดเพื่อเล่นวิดีโอ
+            </button>
+        </div>
+    </div>
+
+    <div id="final-gift-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-pink-100 z-50 hidden opacity-0 transition-opacity duration-1000">
+        <h2 class="text-3xl md:text-5xl font-bold text-pink-500 mb-8 animate-bounce">This Gift for you 🎁</h2>
+        <div id="final-gift-box" class="scene cursor-pointer group">
+            <div class="cube">
+                <div class="cube__face cube__face--front"></div>
+                <div class="cube__face cube__face--back"></div>
+                <div class="cube__face cube__face--right"></div>
+                <div class="cube__face cube__face--left"></div>
+                <div class="cube__face cube__face--top"><div class="ribbon-bow"><div class="ribbon-loop left"></div><div class="ribbon-loop right"></div><div class="ribbon-knot"></div></div></div>
+                <div class="cube__face cube__face--bottom"></div>
+            </div>
+        </div>
+        <p class="mt-8 text-2xl text-pink-500 font-bold animate-pulse hover:text-pink-600 transition-colors">ลองเปิดดูสิ</p>
+    </div>
+
+    <div id="pin-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[110] hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full mx-4 relative transform transition-all scale-100">
+             <button onclick="closePinModal()" class="absolute top-2 right-3 text-gray-400 hover:text-red-500 text-xl"><i class="fas fa-times"></i></button>
+            <h3 id="pin-title" class="text-2xl font-bold text-pink-500 mb-2">Secret Code 🔒</h3>
+            <p id="pin-desc" class="text-sm text-gray-500 mb-6">ใส่รหัสลับ 4 ตัวเพื่อเปิดของขวัญ</p>
+            <div class="mb-6">
+                <input type="tel" id="pin-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" class="w-full text-center text-4xl tracking-[0.5em] font-bold text-pink-600 border-b-4 border-pink-200 focus:border-pink-500 outline-none py-2 bg-transparent" placeholder="••••">
+            </div>
+            <button onclick="checkPin()" class="w-full bg-pink-500 text-white px-6 py-3 rounded-full font-bold hover:bg-pink-600 transition shadow-lg transform hover:-translate-y-1">Open Gift</button>
+            <p id="pin-error" class="text-red-500 text-sm mt-4 hidden font-bold"><i class="fas fa-times-circle mr-1"></i> วันนี้วันที่เท่าไหร่น้าาา</p>
+        </div>
+    </div>
+
+    <div id="envelope-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-pink-200 z-[120] hidden opacity-0 transition-opacity duration-1000">
+        <h2 class="text-3xl font-bold text-white mb-10 drop-shadow-md">สำหรับเธอ...</h2>
+        <div class="envelope-container">
+            <div class="envelope" onclick="toggleEnvelope(this)">
+                <div class="flap"></div>
+                <div class="letter">
+                    <p class="text-lg text-pink-600 font-bold leading-relaxed">
+                        ของขวัญอยู่ในตู้เสื้อผ้า<br>
+                        ไปเปิดดูสิ ❤️
+                    </p>
+                </div>
+            </div>
+        </div>
+        <p class="text-white mt-8 mb-4 animate-bounce">(แตะที่ซองเพื่ออ่าน)</p>
+        <button id="review-btn" onclick="openReviewModal()" class="hidden mt-10 bg-white text-pink-600 px-6 py-3 rounded-full font-bold shadow-lg hover:bg-pink-50 transform hover:scale-105 transition-all">
+            <i class="fas fa-star mr-2 text-yellow-400"></i> รีวิว Surprise
+        </button>
+    </div>
+
+    <div id="review-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[130] hidden opacity-0 transition-opacity duration-300">
+        <div class="review-modal-content">
+            <button onclick="closeReviewModal()" class="absolute top-3 right-4 text-gray-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            <div class="char-img-container">
+                <img id="char-img" src="pic0.png" alt="Character" onerror="this.src='https://via.placeholder.com/150/fbcfe8/be185d?text=Pic0'">
+            </div>
+            <div class="chat-bubble">
+                <p id="char-msg" class="text-pink-600 font-bold text-lg">ชอบเซอร์ไพรส์มั้ยค้าบ? <br> ให้กี่ดาวดีน้า...</p>
+            </div>
+            <div class="star-rating" onmouseleave="resetState()">
+                <i class="fas fa-star star" onmouseover="hoverRate(1)" onclick="rate(1)"></i>
+                <i class="fas fa-star star" onmouseover="hoverRate(2)" onclick="rate(2)"></i>
+                <i class="fas fa-star star" onmouseover="hoverRate(3)" onclick="rate(3)"></i>
+                <i class="fas fa-star star" onmouseover="hoverRate(4)" onclick="rate(4)"></i>
+                <i class="fas fa-star star" onmouseover="hoverRate(5)" onclick="rate(5)"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const config = {
+            startDate: "2025-01-01", 
+            typingSpeed: 50,
+            message: "สุขสันต์วันเกิดนะจิวัน! 🎂 ปีนี้ขอให้เธอมีความสุขมากๆ นะ ยิ้มเยอะๆ สุขภาพแข็งแรง เป็นเด็กดีแบบนี้ตลอดไป ขอบคุณที่เข้ามาเป็นเรื่องราวดีๆ ในชีวิตเรานะ รักเธอที่สุดเลยครับ ❤️"
+        };
+
+        const musicBtn = document.getElementById('music-control');
+        const bgMusic = document.getElementById('bg-music');
+        const giftTrigger = document.getElementById('gift-trigger');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const mainContent = document.getElementById('main-content');
+        const candleFlame = document.getElementById('candle-flame');
+        const wishText = document.getElementById('wish-text');
+        const videoModal = document.getElementById('video-modal');
+        const videoIframe = document.getElementById('hbd-video');
+        const videoErrorMsg = document.getElementById('video-error-msg');
+        const manualPlayBtn = document.getElementById('manual-play-btn');
+        const finalGiftScreen = document.getElementById('final-gift-screen');
+        const finalGiftBox = document.getElementById('final-gift-box');
+        const pinModal = document.getElementById('pin-modal');
+        const pinInput = document.getElementById('pin-input');
+        const pinError = document.getElementById('pin-error');
+        const pinTitle = document.getElementById('pin-title');
+        const envelopeScreen = document.getElementById('envelope-screen');
+        const reviewBtn = document.getElementById('review-btn');
+        const reviewModal = document.getElementById('review-modal');
+        const charImg = document.getElementById('char-img');
+        const charMsg = document.getElementById('char-msg');
+        const stars = document.querySelectorAll('.star');
+        const curtain = document.getElementById('curtain');
+        const finaleScreen = document.getElementById('finale-screen');
+        const finaleChar = document.getElementById('finale-char');
+        const finaleMsg = document.getElementById('finale-msg');
+
+        // Audio Context for reliable sounds (Click/Type)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        // Sound Synthesis Functions
+        function playClickSound() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // Mechanical Typewriter Sound (For PIN input only)
+        function playTypeSound() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const t = audioCtx.currentTime;
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, t);
+            osc.frequency.exponentialRampToValueAtTime(100, t + 0.05);
+            
+            gain.gain.setValueAtTime(0.15, t); 
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+            
+            osc.start(t);
+            osc.stop(t + 0.05);
+
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            
+            osc2.type = 'square';
+            osc2.frequency.setValueAtTime(2000, t);
+            osc2.frequency.exponentialRampToValueAtTime(500, t + 0.02);
+            
+            gain2.gain.setValueAtTime(0.05, t);
+            gain2.gain.exponentialRampToValueAtTime(0.01, t + 0.02);
+            
+            osc2.start(t);
+            osc2.stop(t + 0.02);
+        }
+
+        function startSparklerSound() {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Create white noise buffer
+            const bufferSize = audioCtx.sampleRate * 2; // 2 seconds
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+
+            sparklerAudioSource = audioCtx.createBufferSource();
+            sparklerAudioSource.buffer = buffer;
+            sparklerAudioSource.loop = true;
+
+            // Create filter for "hissing" sound
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 1000; // Remove low rumble
+
+            sparklerGainNode = audioCtx.createGain();
+            sparklerGainNode.gain.value = 0.1; // Lower volume
+
+            sparklerAudioSource.connect(filter);
+            filter.connect(sparklerGainNode);
+            sparklerGainNode.connect(audioCtx.destination);
+            
+            sparklerAudioSource.start();
+        }
+
+        function stopSparklerSound() {
+            if (sparklerAudioSource) {
+                // Fade out
+                if (sparklerGainNode) {
+                    sparklerGainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                }
+                if (sparklerAudioSource) {
+                    sparklerAudioSource.stop(audioCtx.currentTime + 0.5);
+                }
+                sparklerAudioSource = null;
+            }
+        }
+
+        let isMusicPlaying = false;
+        let currentRating = 0;
+        let autoCloseTimeout = null;
+        let sparklerInterval; // Variable to hold the interval ID
+
+        function startMusic() {
+            bgMusic.volume = 0.5;
+            bgMusic.play().then(() => {
+                isMusicPlaying = true;
+                updateMusicBtnUI(true);
+            }).catch(e => console.log("Audio Error:", e));
+        }
+
+        function stopMusic() {
+            bgMusic.pause();
+            isMusicPlaying = false;
+            updateMusicBtnUI(false);
+        }
+
+        function toggleMusic() { if (isMusicPlaying) stopMusic(); else startMusic(); }
+        function updateMusicBtnUI(playing) { musicBtn.innerHTML = playing ? '<i class="fas fa-compact-disc text-pink-500 text-2xl"></i>' : '<i class="fas fa-play text-pink-500 text-xl"></i>'; if(playing) musicBtn.classList.add('music-playing'); else musicBtn.classList.remove('music-playing'); }
+
+        giftTrigger.addEventListener('click', () => {
+            giftTrigger.classList.add('gift-open'); startMusic();
+            setTimeout(() => { welcomeScreen.style.opacity = '0'; setTimeout(() => { welcomeScreen.style.display = 'none'; mainContent.classList.remove('hidden'); requestAnimationFrame(() => { mainContent.style.opacity = '1'; initConfetti(); startTypewriter(); musicBtn.classList.remove('hidden'); }); }, 1000); }, 800);
+        });
+
+        // --- Global Click Effect & Sound ---
+        document.addEventListener('click', (e) => {
+            playClickSound(); // Use JS Synth Sound
+            const x = e.clientX; const y = e.clientY; const colors = ['#ec4899', '#f472b6', '#fbbf24', '#ffffff', '#a78bfa'];
+            for(let i=0; i<8; i++) {
+                const particle = document.createElement('div'); particle.classList.add('click-particle');
+                const tx = (Math.random() - 0.5) * 100; const ty = (Math.random() - 0.5) * 100;
+                particle.style.left = `${x}px`; particle.style.top = `${y}px`; particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.setProperty('--tx', `${tx}px`); particle.style.setProperty('--ty', `${ty}px`);
+                document.body.appendChild(particle); setTimeout(() => particle.remove(), 800);
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            const particle = document.createElement('div'); particle.classList.add('cursor-trail');
+            const size = Math.random() * 8 + 2; particle.style.width = `${size}px`; particle.style.height = `${size}px`;
+            const colors = ['#fbcfe8', '#f472b6', '#ec4899', '#fdf2f8'];
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.left = `${e.clientX}px`; particle.style.top = `${e.clientY}px`;
+            document.body.appendChild(particle);
+            setTimeout(() => { particle.style.transform = `translate(${Math.random()*20-10}px, ${Math.random()*20+10}px) scale(0)`; particle.style.opacity = '0'; }, 10);
+            setTimeout(() => { particle.remove(); }, 500);
+        });
+
+        const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d'); let confetti = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        class ConfettiParticle {
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height - canvas.height; this.size = Math.random() * 10 + 5; this.speedY = Math.random() * 3 + 2; this.speedX = Math.random() * 2 - 1; this.color = `hsl(${Math.random() * 360}, 100%, 70%)`; this.rotation = Math.random() * 360; this.rotationSpeed = Math.random() * 10 - 5; }
+            update() { this.y += this.speedY; this.x += this.speedX; this.rotation += this.rotationSpeed; if (this.y > canvas.height) { this.y = -10; this.x = Math.random() * canvas.width; } }
+            draw() { ctx.save(); ctx.translate(this.x, this.y); ctx.rotate((this.rotation * Math.PI) / 180); ctx.fillStyle = this.color; ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size); ctx.restore(); }
+        }
+        function initConfetti() { for (let i = 0; i < 150; i++) confetti.push(new ConfettiParticle()); animateConfetti(); }
+        function animateConfetti() { ctx.clearRect(0, 0, canvas.width, canvas.height); confetti.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animateConfetti); }
+
+        function startTypewriter() { 
+            const textElement = document.getElementById('typewriter-text'); const text = config.message; let index = 0; 
+            function type() { 
+                if (index < text.length) { 
+                    textElement.innerHTML += text.charAt(index); 
+                    // No sound here anymore
+                    index++; setTimeout(type, config.typingSpeed); 
+                } 
+            } type(); 
+        }
+        function updateCounter() { const start = new Date(config.startDate); const now = new Date(); const diff = now - start; const days = Math.floor(diff / (1000 * 60 * 60 * 24)); document.getElementById('counter').innerText = `${days} วัน`; } updateCounter();
+
+        // --- Smoke Creation ---
+        function createSmoke() {
+            const candleContainer = document.querySelector('.relative.inline-block .absolute.top-0.left-1\\/2'); // Target the candle container
+            
+            for(let i=0; i<6; i++) {
+                setTimeout(() => {
+                    const puff = document.createElement('div');
+                    puff.classList.add('smoke-puff');
+                    candleContainer.appendChild(puff);
+                    setTimeout(() => puff.remove(), 2000);
+                }, i * 150);
+            }
+        }
+
+        // --- Sparkler Logic ---
+        function startSparklerEffect() {
+            const candleContainer = document.querySelector('.relative.inline-block .absolute.top-0.left-1\\/2');
+            
+            // Start Sound
+            startSparklerSound();
+            
+            sparklerInterval = setInterval(() => {
+                for(let i=0; i<3; i++) { 
+                    const spark = document.createElement('div');
+                    spark.classList.add('sparkle-fountain');
+                    
+                    const angle = -Math.PI / 2 + (Math.random() - 0.5) * 1.5; 
+                    const velocity = 60 + Math.random() * 60; 
+                    const tx = Math.cos(angle) * velocity;
+                    const ty = Math.sin(angle) * velocity;
+                    
+                    spark.style.setProperty('--tx', `${tx}px`);
+                    spark.style.setProperty('--ty', `${ty}px`);
+                    
+                    const colors = ['#fff', '#ffd700', '#ffeb3b', '#ff9800'];
+                    spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    spark.style.top = '-5px'; // Adjusted origin to be near top of wick
+                    spark.style.left = '50%';
+                    
+                    candleContainer.appendChild(spark);
+                    setTimeout(() => spark.remove(), 600);
+                }
+            }, 10); // Reduced interval for high density
+        }
+
+        function stopSparklerEffect() {
+            clearInterval(sparklerInterval);
+            // Stop Sound
+            stopSparklerSound();
+        }
+
+        // Updated blowCandle
+        function blowCandle() { 
+            if (!candleFlame.classList.contains('out')) { 
+                candleFlame.classList.add('out'); 
+                wishText.innerText = "ขอให้คำอธิษฐานเป็นจริงนะ! ✨"; 
+                wishText.classList.add('text-pink-600', 'font-bold'); 
+                
+                // 1. Smoke
+                createSmoke();
+                
+                // 2. Wait 2.5s (smoke cleared) -> Sparkler
+                setTimeout(() => {
+                    startSparklerEffect();
+                }, 2500);
+
+                // 3. Sparkler runs for 4s (2500 + 4000 = 6500) -> Video
+                setTimeout(() => {
+                    stopSparklerEffect();
+                    showVideo();
+                }, 6500); 
+            } 
+        }
+        
+        function showVideo() { 
+            if (isMusicPlaying) toggleMusic(); 
+            videoModal.classList.remove('hidden'); 
+            void videoModal.offsetWidth; 
+            videoModal.classList.remove('opacity-0'); 
+            
+            // Auto play local video
+            if(videoIframe) {
+                videoIframe.currentTime = 0;
+                // เอาคำสั่ง muted = true ออก เพื่อให้เล่นเสียงได้เลย
+                // videoIframe.muted = true; 
+                var playPromise = videoIframe.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        // Automatic playback started!
+                    })
+                    .catch(error => {
+                        console.log("Autoplay blocked:", error);
+                        // Show manual play button if blocked
+                        manualPlayBtn.classList.remove('hidden');
+                        videoErrorMsg.innerText = "⚠️ Browser บล็อกการเล่นอัตโนมัติ กรุณากดปุ่มเล่น";
+                        videoErrorMsg.classList.remove('hidden');
+                    });
+                }
+            }
+        }
+
+        // Add error listener to video tag
+        if(videoIframe) {
+             videoIframe.addEventListener('error', function() {
+                 document.getElementById('video-error-msg').classList.remove('hidden');
+             }, true);
+        }
+
+        // Manual Play Handler
+        function manualPlayVideo() {
+            if(videoIframe) {
+                videoIframe.muted = false; // Try unmuted
+                videoIframe.play().then(() => {
+                    manualPlayBtn.classList.add('hidden');
+                    videoErrorMsg.classList.add('hidden');
+                });
+            }
+        }
+
+        function closeVideo() { 
+            videoModal.classList.add('opacity-0'); 
+            setTimeout(() => { 
+                videoModal.classList.add('hidden'); 
+                if(videoIframe) {
+                    videoIframe.pause();
+                    videoIframe.currentTime = 0;
+                }
+                if (!isMusicPlaying) toggleMusic(); 
+                setTimeout(showFinalGift, 300); 
+            }, 300); 
+        }
+
+        function showFinalGift() { finalGiftScreen.classList.remove('hidden'); void finalGiftScreen.offsetWidth; finalGiftScreen.classList.remove('opacity-0'); }
+
+        finalGiftBox.addEventListener('click', () => { pinModal.classList.remove('hidden'); pinInput.value = ''; pinError.classList.add('hidden'); pinTitle.innerText = "Secret Code 🔒"; pinTitle.classList.remove('text-green-500'); pinTitle.classList.add('text-pink-500'); setTimeout(() => pinInput.focus(), 100); });
+        function closePinModal() { pinModal.classList.add('hidden'); }
+        
+        function checkPin() {
+            const pin = pinInput.value;
+            if (pin === '0901') {
+                pinTitle.innerText = "เก่งมาก! ❤️"; pinTitle.classList.remove('text-pink-500'); pinTitle.classList.add('text-green-500'); pinError.classList.add('hidden');
+                setTimeout(() => { pinModal.classList.add('hidden'); finalGiftScreen.classList.add('opacity-0'); setTimeout(() => { finalGiftScreen.classList.add('hidden'); envelopeScreen.classList.remove('hidden'); void envelopeScreen.offsetWidth; envelopeScreen.classList.remove('opacity-0'); }, 500); }, 1500);
+            } else {
+                pinError.classList.remove('hidden'); pinError.classList.add('animate-shake'); setTimeout(() => pinError.classList.remove('animate-shake'), 500); pinInput.value = ''; pinInput.focus();
+            }
+        }
+        
+        function toggleEnvelope(element) {
+            element.classList.toggle('open');
+            setTimeout(() => { reviewBtn.classList.remove('hidden'); }, 1500);
+        }
+
+        pinInput.addEventListener('input', (e) => {
+            pinInput.value = pinInput.value.replace(/[^0-9]/g, '');
+            playTypeSound(); // Sound on PIN input remains
+            if (pinInput.value.length === 4) { checkPin(); }
+        });
+        pinInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { checkPin(); return; }
+            if (e.key < '0' || e.key > '9') { e.preventDefault(); }
+        });
+
+        function openReviewModal() { 
+            reviewModal.classList.remove('hidden'); void reviewModal.offsetWidth; reviewModal.classList.remove('opacity-0');
+            currentRating = 0; updateVisuals(0); charMsg.innerHTML = 'ชอบเซอร์ไพรส์มั้ยค้าบ? <br> ให้กี่ดาวดีน้า...'; charMsg.classList.remove('text-pink-600');
+        }
+
+        function closeReviewModal() { 
+            if (autoCloseTimeout) clearTimeout(autoCloseTimeout);
+            reviewModal.classList.add('opacity-0'); 
+            setTimeout(() => { reviewModal.classList.add('hidden'); startFinale(); }, 300); 
+        }
+
+        function hoverRate(score) { updateVisuals(score); }
+        function resetState() { if (currentRating > 0) { updateVisuals(currentRating); } else { updateVisuals(0); } }
+
+        function updateVisuals(score) {
+            stars.forEach((star, index) => {
+                if (index < score) { star.classList.add('active'); star.style.color = '#fbbf24'; } else { star.classList.remove('active'); star.style.color = '#ddd'; }
+            });
+            if (score === 0) { charImg.src = 'pic0.png'; } else if (score >= 4) { charImg.src = 'pic2.png'; } else { charImg.src = 'pic1.png'; }
+        }
+
+        function rate(score) {
+            currentRating = score; updateVisuals(score);
+            if (autoCloseTimeout) clearTimeout(autoCloseTimeout);
+            if (score >= 4) {
+                charMsg.innerHTML = 'เย้ ดีใจจัง! ❤️<br>รักเทอนะ'; charMsg.classList.add('text-pink-600');
+                for(let i=0; i<30; i++) confetti.push(new ConfettiParticle());
+                autoCloseTimeout = setTimeout(closeReviewModal, 5000);
+            } else {
+                charMsg.innerHTML = 'แง้! <br>ปีหน้าเอาใหม่'; charMsg.classList.remove('text-pink-600');
+            }
+        }
+
+        function startFinale() {
+            finaleScreen.classList.add('active');
+            setTimeout(() => { finaleChar.classList.add('show'); }, 500);
+            setTimeout(() => { finaleMsg.classList.add('show'); }, 1500);
+            setTimeout(() => { curtain.classList.add('dropped'); }, 4500);
+        }
+
+        document.getElementById('current-year').innerText = new Date().getFullYear();
+    </script>
+</body>
+</html>
